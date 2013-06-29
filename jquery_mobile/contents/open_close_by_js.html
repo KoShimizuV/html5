@@ -13,13 +13,11 @@
 <h3 id="h1">header</h3> 
 <p>this is hidden contents</p> 
 </div>
-<a href="#" onClick="doClose()">close</a>
+<a href="#" id="close_btn">close</a>
 <script type="text/javascript"><!--
-  function doClose(){
-    alert("test");
+  $("#close_btn").click( function(){
     $('#h1').trigger('collapse');
-    alert("test2");
-  }
+  });
 --></script>
 </body>
 </html>
