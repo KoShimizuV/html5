@@ -1,0 +1,33 @@
+<html>
+<script type="text/javascript">
+window.addEventListener('DOMContentLoaded',
+  function() {
+    if (localStorage) {
+      var storage = localStorage;
+
+      var show = function() {
+        var str = '<table>';
+        for (var i = 0; i < storage.length; i++) {
+          var k = storage.key(i);
+          str += '<tr><th>' + k + '</th>';
+          str += '<td>' + storage.getItem(k) + '</th></tr>';
+        }
+        str += '</table>';
+        document.querySelector('#result').innerHTML = str;
+      };
+      show();
+    }
+  }
+);
+</script>
+<body>
+<ul>
+<li><a href="./set.html">set.html</a>
+<li><a href="./get.html">get.html</a>
+<li><a href="./delete.html">delete.html</a>
+</ul>
+
+<table id="result"></table>
+
+</body>
+</html>

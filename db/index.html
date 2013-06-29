@@ -1,0 +1,35 @@
+<html>
+<body>
+<script type="text/javascript"><!--
+db = openDatabase('sample', '', 'サンプルデータベース', 1048576);
+db.transaction(
+  function(tx) {
+    tx.executeSql('CREATE TABLE if not exists address(name, address)');
+    tx.executeSql("INSERT INTO address VALUES ('山田太郎', '東京都')");
+    tx.executeSql("INSERT INTO address VALUES ('田中次郎', '大阪府')");
+  },
+  function(error) {
+    alert('エラーが発生しました エラーコード：' + error.code + ', エラーメッセージ：' + error.message);
+  },
+  function() {
+    alert('処理成功');
+  }
+);
+
+db.transaction(
+  function (tx){
+    tx.executeSql("SELECT * FROM address", [], function(tx, rs) {
+      var html = '';
+      for (var i = 0, j = rs.rows.length; i < j; i++) {
+        var row = rs.rows.item(i);
+        html += '<li>氏名 = ' + row.name + ', 住所 = ' + row.address + '</li>';
+        document.getElementById('result').innerHTML = html;
+      }
+    });
+  }
+);
+
+--></script>
+<div id='result'></div>
+</body>
+</html>

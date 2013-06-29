@@ -1,0 +1,185 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Box2D + enchant.js</title>
+
+    <!--=============================-->
+    <!-- Copy this part to your app. -->
+    <!-- START                       -->
+    <!--=============================-->
+    <!-- libs -->
+    <!--[if IE]><script type="text/javascript" src="lib/excanvas.js"></script><![endif]-->
+    <script src="lib/prototype-1.6.0.2.js"></script>
+
+    <!-- box2djs -->
+    <script src='js/box2d/common/b2Settings.js'></script>
+    <script src='js/box2d/common/math/b2Vec2.js'></script>
+    <script src='js/box2d/common/math/b2Mat22.js'></script>
+    <script src='js/box2d/common/math/b2Math.js'></script>
+    <script src='js/box2d/collision/b2AABB.js'></script>
+    <script src='js/box2d/collision/b2Bound.js'></script>
+    <script src='js/box2d/collision/b2BoundValues.js'></script>
+    <script src='js/box2d/collision/b2Pair.js'></script>
+    <script src='js/box2d/collision/b2PairCallback.js'></script>
+    <script src='js/box2d/collision/b2BufferedPair.js'></script>
+    <script src='js/box2d/collision/b2PairManager.js'></script>
+    <script src='js/box2d/collision/b2BroadPhase.js'></script>
+    <script src='js/box2d/collision/b2Collision.js'></script>
+    <script src='js/box2d/collision/Features.js'></script>
+    <script src='js/box2d/collision/b2ContactID.js'></script>
+    <script src='js/box2d/collision/b2ContactPoint.js'></script>
+    <script src='js/box2d/collision/b2Distance.js'></script>
+    <script src='js/box2d/collision/b2Manifold.js'></script>
+    <script src='js/box2d/collision/b2OBB.js'></script>
+    <script src='js/box2d/collision/b2Proxy.js'></script>
+    <script src='js/box2d/collision/ClipVertex.js'></script>
+    <script src='js/box2d/collision/shapes/b2Shape.js'></script>
+    <script src='js/box2d/collision/shapes/b2ShapeDef.js'></script>
+    <script src='js/box2d/collision/shapes/b2BoxDef.js'></script>
+    <script src='js/box2d/collision/shapes/b2CircleDef.js'></script>
+    <script src='js/box2d/collision/shapes/b2CircleShape.js'></script>
+    <script src='js/box2d/collision/shapes/b2MassData.js'></script>
+    <script src='js/box2d/collision/shapes/b2PolyDef.js'></script>
+    <script src='js/box2d/collision/shapes/b2PolyShape.js'></script>
+    <script src='js/box2d/dynamics/b2Body.js'></script>
+    <script src='js/box2d/dynamics/b2BodyDef.js'></script>
+    <script src='js/box2d/dynamics/b2CollisionFilter.js'></script>
+    <script src='js/box2d/dynamics/b2Island.js'></script>
+    <script src='js/box2d/dynamics/b2TimeStep.js'></script>
+    <script src='js/box2d/dynamics/contacts/b2ContactNode.js'></script>
+    <script src='js/box2d/dynamics/contacts/b2Contact.js'></script>
+    <script src='js/box2d/dynamics/contacts/b2ContactConstraint.js'></script>
+    <script src='js/box2d/dynamics/contacts/b2ContactConstraintPoint.js'></script>
+    <script src='js/box2d/dynamics/contacts/b2ContactRegister.js'></script>
+    <script src='js/box2d/dynamics/contacts/b2ContactSolver.js'></script>
+    <script src='js/box2d/dynamics/contacts/b2CircleContact.js'></script>
+    <script src='js/box2d/dynamics/contacts/b2Conservative.js'></script>
+    <script src='js/box2d/dynamics/contacts/b2NullContact.js'></script>
+    <script src='js/box2d/dynamics/contacts/b2PolyAndCircleContact.js'></script>
+    <script src='js/box2d/dynamics/contacts/b2PolyContact.js'></script>
+    <script src='js/box2d/dynamics/b2ContactManager.js'></script>
+    <script src='js/box2d/dynamics/b2World.js'></script>
+    <script src='js/box2d/dynamics/b2WorldListener.js'></script>
+    <script src='js/box2d/dynamics/joints/b2JointNode.js'></script>
+    <script src='js/box2d/dynamics/joints/b2Joint.js'></script>
+    <script src='js/box2d/dynamics/joints/b2JointDef.js'></script>
+    <script src='js/box2d/dynamics/joints/b2DistanceJoint.js'></script>
+    <script src='js/box2d/dynamics/joints/b2DistanceJointDef.js'></script>
+    <script src='js/box2d/dynamics/joints/b2Jacobian.js'></script>
+    <script src='js/box2d/dynamics/joints/b2GearJoint.js'></script>
+    <script src='js/box2d/dynamics/joints/b2GearJointDef.js'></script>
+    <script src='js/box2d/dynamics/joints/b2MouseJoint.js'></script>
+    <script src='js/box2d/dynamics/joints/b2MouseJointDef.js'></script>
+    <script src='js/box2d/dynamics/joints/b2PrismaticJoint.js'></script>
+    <script src='js/box2d/dynamics/joints/b2PrismaticJointDef.js'></script>
+    <script src='js/box2d/dynamics/joints/b2PulleyJoint.js'></script>
+    <script src='js/box2d/dynamics/joints/b2PulleyJointDef.js'></script>
+    <script src='js/box2d/dynamics/joints/b2RevoluteJoint.js'></script>
+    <script src='js/box2d/dynamics/joints/b2RevoluteJointDef.js'></script>
+
+    <script src='enchant.js'></script>
+
+<script language='JavaScript'>
+
+// Box2Dの空間を作成
+var worldAABB = new b2AABB();
+// 空間の大きさを設定
+worldAABB.minVertex.Set(-1000, -1000);
+worldAABB.maxVertex.Set(1000, 1000);
+// 仮想世界に働く重力を定義
+var gravity = new b2Vec2(0, 100);
+// 仮想世界を作成
+var world = new b2World(worldAABB, gravity, true);
+
+var oldTime = new Date(); // 現在時刻を取得
+window.onload = function () {
+  enchant(); // ゲームエンジンを起動
+  
+  var game = new Game(640, 640); // ゲームを作成
+
+  // 画像を物体として追加する関数
+  function addBoxImage(scene, imageName, x, y, width, height, params) {
+    // Box2Dの物体を作成する
+    var boxSd = new b2BoxDef();
+    boxSd.extents.Set(width/2, height/2);
+    for(var i in params) boxSd[i] = params[i];
+    var boxBd = new b2BodyDef();
+    boxBd.AddShape(boxSd);
+    boxBd.position.Set(x,y);
+    var box = world.CreateBody(boxBd);
+
+    // enchant.jsの画像を作成する
+    var sprite = new Sprite(width, height);
+    sprite.x = x - width/2;
+    sprite.y = y - height/2;
+    sprite.image = game.assets[imageName];
+    // 画像をシーンに追加する
+    scene.addChild(sprite);
+    // 物体オブジェクトの「sprite」プロパティに画像を設定する
+    box.sprite = sprite;
+    // 「box2dobj」プロパティに物体を設定し、画像を返す
+    sprite.box2dobj = box;
+    return sprite;
+  }
+  
+  // gameはGameクラスのインスタンス
+  game.preload('floor.png', 'heart.png');
+
+  game.onload = function() {
+    var scene = new Scene(); // シーンを作成
+
+    // 床の追加
+    right = addBoxImage(scene, 'floor.png', 950, 0, 40, 640, {});
+    floor = addBoxImage(scene, 'floor.png', 320, 600, 640, 80, {});
+    // 箱の追加
+    box1 = addBoxImage(scene, 'heart.png', 320, 100, 40, 40, {"density":1.0, "friction":0.2, "restitution":0.7});
+    box2 = addBoxImage(scene, 'heart.png', 310, 150, 40, 40, {"density":1.0, "friction":0.2, "restitution":0.7});
+    box3 = addBoxImage(scene, 'heart.png', 330, 200, 40, 40, {"density":1.0, "friction":0.2, "restitution":0.7});
+
+    box1.addEventListener('touchstart', function() {
+      box1.box2dobj.WakeUp();
+      // 斜め上に向けて衝撃を加える
+      box1.box2dobj.ApplyImpulse(new b2Vec2(100000, -100000) , box1.box2dobj.GetCenterPosition());
+    });
+
+    box2.addEventListener('touchstart', function() {
+      box2.box2dobj.WakeUp();
+      //斜め上に向けた力を加える
+      box2.box2dobj.ApplyForce(new b2Vec2(10000000, -10000000) , box2.box2dobj.GetCenterPosition());
+    });
+
+    box3.addEventListener('touchstart', function() {
+      box3.box2dobj.WakeUp();
+      // 時計回りのトルクを加える
+      box3.box2dobj.ApplyTorque(100000000);
+    });
+
+    game.pushScene(scene); // ゲームにシーンを追加
+
+    // ゲームの画面の再描画イベントを登録    
+    game.addEventListener('enterframe', function() {
+      // 経過時刻を計算
+      var newTime = new Date();
+      var tick = newTime.getTime() - oldTime.getTime();
+      // 物理シミュレーションを1ステップ実行する
+      world.Step(tick/1000, 10);
+
+      // すべて物体に対して登録されているスプライトの表示を更新する
+      for (var b = world.GetBodyList(); b; b = b.GetNext()) {
+        if("sprite" in b) {
+          b.sprite.x = b.GetOriginPosition().x - b.sprite.image.width/2;
+          b.sprite.y = b.GetOriginPosition().y - b.sprite.image.height/2;
+          b.sprite.rotation = Math.round(b.GetRotation()/3.14159*180);
+        }
+      }
+
+      oldTime = newTime;
+    });
+  };
+  game.start(); // ゲームを開始
+}
+
+
+</script>
+<body  style="overflow: hidden;"></body></html>
+

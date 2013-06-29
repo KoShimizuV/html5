@@ -1,0 +1,21 @@
+<html>
+<script type="text/javascript">
+window.addEventListener('DOMContentLoaded',
+  function() {
+    if (localStorage) {
+      var storage = localStorage;
+      var current = (new Date()).toLocaleString();
+      storage.setItem('lastAccessed', current);
+      storage.lastAccessed2 = current;
+      storage['lastAccessed3'] = current;
+    }
+  }
+);
+</script>
+<body>
+
+
+<a href="./get.html">get.html</a>
+<a href="./length.html">length.html</a>
+</body>
+</html>

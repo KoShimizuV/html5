@@ -1,0 +1,76 @@
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"> 
+<title>multipage template</title> 
+<link rel="stylesheet" href="//code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+<script src="//code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
+</head> 
+
+<body>
+<!-- Start of first page -->
+<div data-role="page" id="foo">
+<div data-role="header">
+<h1>Question</h1>
+</div><!-- /header -->
+
+<div data-role="content">
+<!-- <p>what does it mean in Japanese</p> -->
+<p><div id="act_id1"></div></p>
+<p><div id="q1"></div></p>
+<p><a href="#bar">check answer</a></p>
+</div><!-- /content -->
+
+<div data-role="footer">
+<h4>Page Footer</h4>
+</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of second page -->
+<div data-role="page" id="bar">
+
+<div data-role="header">
+<h1>Bar</h1>
+</div><!-- /header -->
+
+<div data-role="content">
+<p><div id="act_id2"></div></p>
+<p><div id="q2"></div></p>
+<p><div id="a"></div></p>
+<p><a href="#foo" onclick="next()">Next</a></p>
+</div><!-- /content -->
+
+<div data-role="footer">
+<h4>Page Footer</h4>
+</div><!-- /footer -->
+</div><!-- /page -->
+
+<script type="text/javascript">
+q = new Array("namely", "sufficient");
+a = new Array("sunawachi", "manzokuna");
+active_id = 0;
+
+window.onload = function(){
+  domQA();
+}
+function domQA(){
+  document.getElementById("act_id1").innerText = "Question No" + (active_id +1);
+  document.getElementById("act_id2").innerText = "Question No" + (active_id +1);
+  document.getElementById("q1").innerText = q[active_id];
+  document.getElementById("q2").innerText = q[active_id];
+  document.getElementById("a").innerText = a[active_id];
+}
+
+function next(){
+  ++active_id;
+  if (q.length <= active_id ){
+    alert("return Question 1");
+    active_id = 0; 
+  }
+  domQA();
+}
+
+</script>
+</body>
+</html>

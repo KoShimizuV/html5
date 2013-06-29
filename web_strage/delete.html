@@ -1,0 +1,57 @@
+<html>
+<script type="text/javascript">
+
+window.addEventListener('DOMContentLoaded',
+  function() {
+    if (localStorage) {
+      var storage = localStorage;
+
+      var show = function() {
+        var str = '<table>';
+        for (var i = 0; i < storage.length; i++) {
+          var k = storage.key(i);
+          str += '<tr><th>' + k + '</th>';
+          str += '<td>' + storage.getItem(k) + '</th></tr>';
+        }
+        str += '</table>';
+        document.querySelector('#result').innerHTML = str;
+      };
+      show();
+
+      document.querySelector('#remove').addEventListener('click', function (e) {
+        var n = document.querySelector('#name');
+        storage.removeItem(n.value);
+        show();
+      });
+
+      // ［クリア］ボタンクリックですべてのデータを削除
+      document.querySelector('#clear').addEventListener('click', function (e) {
+        storage.clear();
+        show();
+      });
+    }
+  }
+);
+
+</script>
+<body>
+
+<div class="container">
+  <label for="name">名前：</label>
+  <input id="name" type="text" value="" />
+</div>
+<div class="container">
+  <input id="remove" type="button" value="削除" />
+  <input id="clear" type="button" value="クリア" />
+</div>
+<table id="result"></table>
+
+<ul>
+<li><a href="./set.html">set.html</a>
+<li><a href="./get.html">get.html</a>
+<li><a href="./delete.html">delete.html</a>
+</ul>
+
+
+</body>
+</html>

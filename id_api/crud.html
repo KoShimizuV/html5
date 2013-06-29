@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ 
+<head>
+<meta http-equiv="Content-Type"
+    content="text/html; charset=utf-8">
+<title>Sample</title>
+<style>
+h1 {font-size: 14pt; font-weight:bold;
+    background-color:#DDF; padding:3px; }
+#ftable tr td { background-color:#CFC; }
+#datas tr td { background-color:#FCC; }
+</style>
+ 
+<script type="text/javascript">
+var IDBTransaction;
+var IndexedDB;
+var db;
+var objectStore;
+ 
+IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction;
+try {
+    IndexedDB = mozIndexedDB;
+} catch(e){}
+try {
+    IndexedDB = webkitIndexedDB;
+} catch(e){}
+ 
+function initial(){
+    var request = IndexedDB.open("MyTestDatabase");
+     
+    request.onerror = function(event) {
+        alert("ERROR!");
+    };
+    request.onsuccess = function(event) {
+        db = request.result;
+        createObjectStoreMethod();
+    };
+}
+ 
+function createObjectStoreMethod(){
+    var request = db.setVersion("1.0");
+    request.onerror = function(event) { /* ERROR */ };
+    request.onsuccess = function(event) {
+        try {
+            objectStore = db.createObjectStore("mydata", { keyPath: "name" });
+            objectStore.createIndex("name", "name", { unique: true });
+        }catch(e){}
+        createList();
+    };
+}
+ 
+// データの追加
+function addData(){
+    if (!db) return;
+    var mydatas = db.transaction([],IDBTransaction.READ_WRITE);
+    mydatas.oncomplete = function(event){
+        createList();
+        // alert("compete");
+    };
+    var objectStore = mydatas.objectStore("mydata");
+    var nstr = document.getElementById("name").value;
+    var estr = document.getElementById("email").value;
+    var tstr = document.getElementById("tel").value;
+    var data = { name: nstr, email: estr, tel:tstr };
+    objectStore.put(data);
+}
+ 
+// データの削除
+function delData(){
+    if (!db) return;
+    var mydatas = db.transaction([],IDBTransaction.READ_WRITE);
+    mydatas.oncomplete = function(event){
+        createList();
+        //alert("delete.");
+    };
+    var objectStore = mydatas.objectStore("mydata");
+    var nstr = document.getElementById("name").value;
+    objectStore.delete(nstr);
+}
+ 
+// データを取得
+function doFind(){
+    if (!db) return;
+    var datas = document.getElementById("ftable");
+    for (var i =datas.childNodes.length-1; i>=0; i--){
+        datas.removeChild(datas.childNodes[i]);
+    }
+    var fstr = document.getElementById("fstr").value;
+    var mydatas = db.transaction([]);
+    mydatas.oncomplete = function(event){
+        // alert("find.");
+    };
+    var objectStore = mydatas.objectStore("mydata");
+    var re = objectStore.get(fstr);
+    re.onsuccess = function(e){
+        var val = e.target.result;
+        if (!val) return;
+        var tr = document.createElement("tr");
+        var td1 = document.createElement("td");
+        td1.innerHTML = val.name;
+        tr.appendChild(td1);
+        var td2 = document.createElement("td");
+        td2.innerHTML = val.email;
+        tr.appendChild(td2);
+        var td3 = document.createElement("td");
+        td3.innerHTML = val.tel;
+        tr.appendChild(td3);
+        datas.appendChild(tr);
+    };
+     
+}
+ 
+// リストを表示
+function createList(){
+    if (!db) return;
+    var datas = document.getElementById("datas");
+    for (var i =datas.childNodes.length-1; i>=0; i--){
+        datas.removeChild(datas.childNodes[i]);
+    }
+    var objectStore = db.transaction([]).objectStore("mydata");
+    var re = objectStore.openCursor();
+    re.onsuccess = function(event){
+        var cur = event.target.result;
+        if (!cur) return;
+        var val = cur.value;
+        var tr = document.createElement("tr");
+        var td1 = document.createElement("td");
+        td1.innerHTML = val.name;
+        tr.appendChild(td1);
+        var td2 = document.createElement("td");
+        td2.innerHTML = val.email;
+        tr.appendChild(td2);
+        var td3 = document.createElement("td");
+        td3.innerHTML = val.tel;
+        tr.appendChild(td3);
+        datas.appendChild(tr);
+        cur.continue();
+    };
+}
+</script>
+</head>
+ 
+<body onload="initial();">
+<h1>Index DB Sample.</h1>
+<div>
+<p>※データ検索</p>
+<input type="text" id="fstr">
+<input type="button" onclick="doFind();" value="Find">
+</div>
+<table id="ftable" width="400px"></table>
+<hr>
+<table id="datas" width="400px"></table>
+<hr>
+<div>
+<p>※データ作成</p>
+<input type="text" id="name"><br>
+<input type="text" id="email"><br>
+<input type="text" id="tel"><br>
+<input type="button" value="Add" onclick="addData();">
+</div>
+<hr>
+<p>※データ削除</p>
+<input type="text" id="name">
+<input type="button" value="Delete" onclick="delData();">
+</div>
+</body>
+</html>
