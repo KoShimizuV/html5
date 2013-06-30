@@ -12,20 +12,18 @@
 <div data-role="header">
   <h1>Question</h1>
 </div>
-<div id="temp"></div>
 <p><div id="act_id1"></div></p>
 <p><div id="q1"></div></p>
 
-<p><a href="#" onclick="next()">Next</a></p>
 <div data-role="collapsible">
 <h3 id="check_ans">check answer</h3> 
   <p><div id="a"></div></p>
 </div>
+<p><a href="#" onclick="next()">Next</a></p>
 
 <div data-role="footer">
 <h4>Page Footer</h4>
 </div><!-- /footer -->
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 
 <script type="text/javascript">
 window.onload = function(){
@@ -34,22 +32,9 @@ window.onload = function(){
 }
 
 function init(){
-  q = new Array("namely", "sufficient", "insecure", "controversial");
-  a = new Array("すなわち", "満足な", "不安な", "議論の余地がある");
-  get_data_from_api();
+  q = new Array("namely", "sufficient");
+  a = new Array("sunawachi", "manzokuna");
   active_id = 0;
-}
-
-function get_data_from_api(){
- $.ajax({
-  url: "http://international.cute.coocan.jp/cus/index.php?p=qa&c=api&a=list_qa",
-  data: { out_method: json },
-  success: function( data ) {
-    alert("aaa");
-    $( "#temp" ).html( "<strong>" + data + "</strong>" );
-  }
-}); 
-
 }
 
 function domQA(){
