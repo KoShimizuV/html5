@@ -15,11 +15,11 @@
 <p><div id="act_id1"></div></p>
 <p><div id="q1"></div></p>
 
+<p><a href="#" onclick="next()">Next</a></p>
 <div data-role="collapsible">
 <h3 id="check_ans">check answer</h3> 
   <p><div id="a"></div></p>
 </div>
-<p><a href="#" onclick="next()">Next</a></p>
 
 <div data-role="footer">
 <h4>Page Footer</h4>
@@ -32,8 +32,8 @@ window.onload = function(){
 }
 
 function init(){
-  q = new Array("namely", "sufficient");
-  a = new Array("sunawachi", "manzokuna");
+  q = new Array("namely", "sufficient", "insecure", "controversial");
+  a = new Array("すなわち", "満足な", "不安な", "議論の余地がある");
   active_id = 0;
 }
 
