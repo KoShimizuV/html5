@@ -9,7 +9,7 @@
 </head> 
 
 <body>
-<div data-role="header"><h1 id="act_id1">Question</h1></div>
+<div data-role="header"><h1 id="act_num1">Question</h1></div>
 <p><div id="t1"></div></p>
 <p><div id="q1"></div></p>
 
@@ -19,30 +19,81 @@
 </div>
 <div data-role="collapsible">
   <h3 id="check_ans">check answer</h3> 
+   <div data-role="controlgroup" data-type="horizontal">
+    <a href="#" onclick="ng_inc()" data-role="button">NG</a>
+    <a href="#" onclick="ok_inc()" data-role="button">OK</a>
+  </div>
   <p><div id="a"></div></p>
 </div>
+
+<div data-role="collapsible">
+  <h3 id="opt_menu">optional menu</h3> 
+   <div data-role="controlgroup" data-type="horizontal">
+    <a href="#" onclick="fetch_remote()" data-role="button">fetch remote data</a>
+  </div>
+</div>
+
 
 <div data-role="footer"><h4 id="learnings">Page Footer</h4></div>
 
 <script type="text/javascript">
+var id = new Array();
 var t = new Array();
 var q = new Array();
 var a = new Array();
 var ok = new Array();
 var ng = new Array();
-var active_id = 0;
+var active_num = 0;
+var storage;
 
-window.onload = function(){
-  init();
-  domQA();
-}
+window.addEventListener('DOMContentLoaded',
+  function(){
+    init();
+  }
+);
 
 function init(){
-  active_id = 0;
-  get_data_from_api();
+  dom_all();
+  init_local_storage();
+  var n = storage.getItem("active_num");
+  if(n != null){
+    active_num = Number(n);
+  } 
+  if(has_data_in_local_st()){
+    load_data_from_storage();
+    return;
+  }
+  document.getElementById("act_num1").innerText = "now getting data from API";
+  fetch_data_from_api();
 }
 
-function get_data_from_api(){
+function load_data_from_storage(){
+  var max = storage.getItem("eng_data_n");
+  for(var i=0; i < max; i++){
+     id[i] = storage.getItem("id" + i); 
+     t[i] = storage.getItem("t" + i); 
+     q[i] = storage.getItem("q" +i); 
+     a[i] = storage.getItem("a" +i); 
+     ok[i] = storage.getItem("ok" +i); 
+     ng[i] = storage.getItem("ng" +i); 
+  } 
+  dom_all();
+}
+
+function init_local_storage(){
+  if (!localStorage) {
+     alert("this browser does not supported localstorage");
+     return;
+  }
+  storage = localStorage;
+}
+
+function has_data_in_local_st(){
+  var n = storage.getItem('eng_data_n');
+  return n != null;
+}
+
+function fetch_data_from_api(){
  $.ajax({
    url: "/cus/index.php?p=qa&c=api&a=list_qa",
    data: { 
@@ -52,42 +103,82 @@ function get_data_from_api(){
    success: function( data ) {
      var list = $.parseJSON(data);
      for(var i = 0; i < list.length; i++){
-       t[i] = list[i]["title"]; 
-       q[i] = list[i]["qu"]; 
-       a[i] = list[i]["ans"]; 
-       ok[i] = list[i]["correct_cnt"]; 
-       ng[i] = list[i]["uncorrect_cnt"]; 
+       storage.setItem("id"+i, list[i]["id"]);
+       storage.setItem("t"+i, list[i]["title"]);
+       storage.setItem("q"+i, list[i]["qu"]);
+       storage.setItem("a"+i, list[i]["ans"]);
+       storage.setItem("ok"+i, list[i]["correct_cnt"]);
+       storage.setItem("ng"+i, list[i]["uncorrect_cnt"]);
+       storage.setItem("eng_data_n",i);
      } 
-     domQA();
+     load_data_from_storage();
+     alert("fetch data from api");
    }
  }); 
 
 }
 
-function domQA(){
-  document.getElementById("act_id1").innerText = "No" + (active_id +1) + "/" + q.length;
-  document.getElementById("t1").innerText = t[active_id];
-  document.getElementById("q1").innerText = q[active_id];
-  document.getElementById("a").innerText = a[active_id];
-  document.getElementById("learnings").innerText = "o:" + ok[active_id] + ", x:" + ng[active_id];
+function dom_all(){
+  document.getElementById("act_num1").innerText = "No" + (active_num +1) + "/" + q.length +" id:" + id[active_num];
+  document.getElementById("t1").innerText = t[active_num];
+  document.getElementById("q1").innerText = q[active_num];
+  document.getElementById("a").innerText = a[active_num];
+  document.getElementById("learnings").innerText = "o:" + ok[active_num] + ", x:" + ng[active_num];
+}
+
+function save_active_num(){
+  storage.setItem("active_num", active_num);
 }
 
 function next(){
-  ++active_id;
-  if (q.length <= active_id ){
+  ++active_num;
+  if (q.length <= active_num ){
     alert("return Question 1");
-    active_id = 0; 
+    active_num = 0; 
   }
   $('#check_ans').trigger('collapse');
-  domQA();
+  dom_all();
+  save_active_num();
 }
 
 function back(){
-  --active_id;
+  --active_num;
   $('#check_ans').trigger('collapse');
-  domQA();
+  dom_all();
+  save_active_num();
 }
 
+function ok_inc(){
+  ok[active_num]++;
+  storage.setItem("ok"+active_num, ok[active_num]);
+  next();
+}
+
+function ng_inc(){
+  ng[active_num]++;
+  storage.setItem("ng"+active_num, ng[active_num]);
+  next();
+}
+
+function fetch_remote(){
+  storage.clear();
+  fetch_data_from_api();
+  $('#opt_menu').trigger('collapse');
+}
+
+function push_remote(){
+  $.ajax({
+   url: "/cus/index.php?p=qa&c=api&a=update_ok_ng",
+   data: { 
+          "ok": ok , 
+          "ng": ng , 
+         },
+   success: function( data ) {
+     alert("push data from api");
+   }
+ }); 
+
+}
 
 </script>
 </body>
