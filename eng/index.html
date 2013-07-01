@@ -13,18 +13,23 @@
 <p><div id="t1"></div></p>
 <p><div id="q1"></div></p>
 
-<p><a href="#" onclick="back()">back</a> __ <a href="#" onclick="next()">Next</a></p>
+<div data-role="controlgroup" data-type="horizontal">
+  <a href="#" onclick="back()" data-role="button">back</a>
+  <a href="#" onclick="next()" data-role="button">Next</a>
+</div>
 <div data-role="collapsible">
   <h3 id="check_ans">check answer</h3> 
   <p><div id="a"></div></p>
 </div>
 
-<div data-role="footer"><h4>Page Footer</h4></div>
+<div data-role="footer"><h4 id="learnings">Page Footer</h4></div>
 
 <script type="text/javascript">
 var t = new Array();
 var q = new Array();
 var a = new Array();
+var ok = new Array();
+var ng = new Array();
 var active_id = 0;
 
 window.onload = function(){
@@ -50,6 +55,8 @@ function get_data_from_api(){
        t[i] = list[i]["title"]; 
        q[i] = list[i]["qu"]; 
        a[i] = list[i]["ans"]; 
+       ok[i] = list[i]["correct_cnt"]; 
+       ng[i] = list[i]["uncorrect_cnt"]; 
      } 
      domQA();
    }
@@ -62,6 +69,7 @@ function domQA(){
   document.getElementById("t1").innerText = t[active_id];
   document.getElementById("q1").innerText = q[active_id];
   document.getElementById("a").innerText = a[active_id];
+  document.getElementById("learnings").innerText = "o:" + ok[active_id] + ", x:" + ng[active_id];
 }
 
 function next(){
