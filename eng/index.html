@@ -9,51 +9,57 @@
 </head> 
 
 <body>
-<div data-role="header">
-  <h1>Question</h1>
-</div>
-<div id="temp"></div>
-<p><div id="act_id1"></div></p>
+<div data-role="header"><h1 id="act_id1">Question</h1></div>
+<p><div id="t1"></div></p>
 <p><div id="q1"></div></p>
 
-<p><a href="#" onclick="next()">Next</a></p>
+<p><a href="#" onclick="back()">back</a> __ <a href="#" onclick="next()">Next</a></p>
 <div data-role="collapsible">
-<h3 id="check_ans">check answer</h3> 
+  <h3 id="check_ans">check answer</h3> 
   <p><div id="a"></div></p>
 </div>
 
-<div data-role="footer">
-<h4>Page Footer</h4>
-</div><!-- /footer -->
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+<div data-role="footer"><h4>Page Footer</h4></div>
 
 <script type="text/javascript">
+var t = new Array();
+var q = new Array();
+var a = new Array();
+var active_id = 0;
+
 window.onload = function(){
   init();
   domQA();
 }
 
 function init(){
-  q = new Array("namely", "sufficient", "insecure", "controversial");
-  a = new Array("すなわち", "満足な", "不安な", "議論の余地がある");
-  get_data_from_api();
   active_id = 0;
+  get_data_from_api();
 }
 
 function get_data_from_api(){
  $.ajax({
-  url: "http://international.cute.coocan.jp/cus/index.php?p=qa&c=api&a=list_qa",
-  data: { out_method: json },
-  success: function( data ) {
-    alert("aaa");
-    $( "#temp" ).html( "<strong>" + data + "</strong>" );
-  }
-}); 
+   url: "/cus/index.php?p=qa&c=api&a=list_qa",
+   data: { 
+          "out_method": "json" , 
+          "category": "英和" , 
+         },
+   success: function( data ) {
+     var list = $.parseJSON(data);
+     for(var i = 0; i < list.length; i++){
+       t[i] = list[i]["title"]; 
+       q[i] = list[i]["qu"]; 
+       a[i] = list[i]["ans"]; 
+     } 
+     domQA();
+   }
+ }); 
 
 }
 
 function domQA(){
-  document.getElementById("act_id1").innerText = "Question No" + (active_id +1);
+  document.getElementById("act_id1").innerText = "No" + (active_id +1) + "/" + q.length;
+  document.getElementById("t1").innerText = t[active_id];
   document.getElementById("q1").innerText = q[active_id];
   document.getElementById("a").innerText = a[active_id];
 }
@@ -67,6 +73,13 @@ function next(){
   $('#check_ans').trigger('collapse');
   domQA();
 }
+
+function back(){
+  --active_id;
+  $('#check_ans').trigger('collapse');
+  domQA();
+}
+
 
 </script>
 </body>
