@@ -27,12 +27,14 @@
 </div>
 
 <div data-role="collapsible">
-  <h3 id="opt_menu">optional menu</h3> 
+  <h3 id="opt_menu">option</h3> 
    <div data-role="controlgroup" data-type="horizontal">
-    <a href="#" onclick="fetch_remote()" data-role="button">fetch remote data</a>
+    <div><input type="text" name="login_id" id="login_id" /></div>
+    <div><input type="text" name="password" id="password" /></div>
+    <a href="#" onclick="fetch_remote()" data-role="button">fetch data from remote</a>
+    <a href="#" onclick="push_remote()" data-role="button">push data to remote</a>
   </div>
 </div>
-
 
 <div data-role="footer"><h4 id="learnings">Page Footer</h4></div>
 
@@ -69,7 +71,7 @@ function init(){
 
 function load_data_from_storage(){
   var max = storage.getItem("eng_data_n");
-  for(var i=0; i < max; i++){
+  for(var i=0; i <= max; i++){
      id[i] = storage.getItem("id" + i); 
      t[i] = storage.getItem("t" + i); 
      q[i] = storage.getItem("q" +i); 
@@ -113,7 +115,10 @@ function fetch_data_from_api(){
      } 
      load_data_from_storage();
      alert("fetch data from api");
-   }
+   },
+   error: function( data ) {
+     alert("error has happend. \n" + data);
+   },
  }); 
 
 }
@@ -123,7 +128,11 @@ function dom_all(){
   document.getElementById("t1").innerText = t[active_num];
   document.getElementById("q1").innerText = q[active_num];
   document.getElementById("a").innerText = a[active_num];
-  document.getElementById("learnings").innerText = "o:" + ok[active_num] + ", x:" + ng[active_num];
+  document.getElementById("learnings").innerText = get_ok_ng_message();
+}
+
+function get_ok_ng_message(){
+  return "o:" + ok[active_num] + ", x:" + ng[active_num];
 }
 
 function save_active_num(){
@@ -151,13 +160,15 @@ function back(){
 function ok_inc(){
   ok[active_num]++;
   storage.setItem("ok"+active_num, ok[active_num]);
-  next();
+  alert(get_ok_ng_message());
+  dom_all();
 }
 
 function ng_inc(){
   ng[active_num]++;
   storage.setItem("ng"+active_num, ng[active_num]);
-  next();
+  alert(get_ok_ng_message());
+  dom_all();
 }
 
 function fetch_remote(){
@@ -167,17 +178,53 @@ function fetch_remote(){
 }
 
 function push_remote(){
+  var ok_by_id = build_id_array(ok);
+  var ng_by_id = build_id_array(ng);
+  var login_id = document.getElementById("login_id").value;
+  var password = document.getElementById("password").value;
   $.ajax({
    url: "/cus/index.php?p=qa&c=api&a=update_ok_ng",
    data: { 
-          "ok": ok , 
-          "ng": ng , 
+          "login_id" : login_id,
+          "password" : password,
+          "ok": ok_by_id , 
+          "ng": ng_by_id , 
          },
    success: function( data ) {
-     alert("push data from api");
-   }
+     alert("push data to api");
+     alert(data);
+   }, 
+   error: function( data ) {
+     alert("error has happend. \n" + data);
+   },
  }); 
 
+}
+
+function test_suiltes(){
+  test_build_id_array();
+}
+
+function test_push_remote(){
+  document.getElementById("login_id").value = "k";
+  document.getElementById("password").value = "k";
+  push_remote();
+}
+
+function test_build_id_array(){
+  id[0] = 999;
+  ok[0] = 10;
+  var arr = build_id_array(ok);
+  alert(arr[999] == 10);
+}
+
+function build_id_array(val_arr){
+  var arr = new Array();
+  for(var i = 0; i < val_arr.length; i++){
+    var tmp_id  = id[i];
+    arr[tmp_id] = val_arr[i]; 
+  }
+  return arr;
 }
 
 </script>
