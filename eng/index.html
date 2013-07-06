@@ -33,6 +33,8 @@
     <div><input type="text" name="password" id="password" /></div>
     <a href="#" onclick="fetch_remote()" data-role="button">fetch data from remote</a>
     <a href="#" onclick="push_remote()" data-role="button">push data to remote</a>
+    <br/>
+    <a href="report.html"  data-role="button">Report</a>
   </div>
 </div>
 
@@ -139,12 +141,32 @@ function save_active_num(){
   storage.setItem("active_num", active_num);
 }
 
-function next(){
-  ++active_num;
-  if (q.length <= active_num ){
+function get_next_num(){
+  if(q.lengh <= active_num){
     alert("return Question 1");
-    active_num = 0; 
+    return 0; 
   }
+  if(active_num < 9){
+    return active_num + 1;
+  }
+  // calc
+  for(var i=active_num - 9; i < active_num; i++){
+    if(!is_complete(ok[i], ng[i])){
+      return i;
+    }
+  }
+  return active_num + 1;
+}
+
+function is_complete(ok, ng){
+  if(ok < 5){
+    return false;
+  }
+  return 3 <= ok - ng;
+}
+
+function next(){
+  active_num = get_next_num(); 
   $('#check_ans').trigger('collapse');
   dom_all();
   save_active_num();
@@ -170,6 +192,8 @@ function ng_inc(){
   alert(get_ok_ng_message());
   dom_all();
 }
+
+
 
 function fetch_remote(){
   storage.clear();
