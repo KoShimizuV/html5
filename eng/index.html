@@ -141,24 +141,47 @@ function save_active_num(){
   storage.setItem("active_num", active_num);
 }
 
+function next(){
+  active_num = get_next_num(); 
+  $('#check_ans').trigger('collapse');
+  dom_all();
+  save_active_num();
+}
+
 function get_next_num(){
   if(q.length <= active_num+1){
     alert("return Question 1");
     return 0; 
   }
-  if(active_num < 20){
+  if(active_num < 10){
     return active_num + 1;
   }
-  if(get_ans_count() % 20 != 0){
+  if(get_ans_count() % 10 != 0){
     return active_num + 1; 
   }
   // calc
-  for(var i=active_num - 9; i < active_num; i++){
+  return get_last_ng_id(active_num, 10);
+}
+
+function get_last_completed_id(active_num, back_range){
+  for(var i=active_num - 20; i < active_num; i++){
     if(!is_complete(ok[i], ng[i])){
       return i;
     }
   }
-  return active_num + 1;
+}
+
+function get_last_ng_id (active_num, back_range) {
+   for(var i=active_num - back_range; i < active_num; i++){
+    if(get_last_result(i) == "NG"){
+      return i;
+    }
+  }
+  return i;  
+}
+
+function set_ans_count(n){
+  return storage.setItem("ans_count", n);
 }
 
 function get_ans_count(){
@@ -176,13 +199,6 @@ function is_complete(ok, ng){
   return 3 <= ok - ng;
 }
 
-function next(){
-  active_num = get_next_num(); 
-  $('#check_ans').trigger('collapse');
-  dom_all();
-  save_active_num();
-}
-
 function back(){
   --active_num;
   $('#check_ans').trigger('collapse');
@@ -194,6 +210,7 @@ function ok_inc(){
   inc_ans_count();
   ok[active_num]++;
   storage.setItem("ok"+active_num, ok[active_num]);
+  set_last_result(active_num, "OK");
   alert(get_ok_ng_message());
   dom_all();
 }
@@ -202,10 +219,18 @@ function ng_inc(){
   inc_ans_count();
   ng[active_num]++;
   storage.setItem("ng"+active_num, ng[active_num]);
+  set_last_result(active_num, "NG");
   alert(get_ok_ng_message());
   dom_all();
 }
 
+function get_last_result(n){
+  return storage.getItem("last_ans"+n);
+}
+
+function set_last_result(n, ret){
+  storage.setItem("last_ans"+n, ret);
+}
 
 function fetch_remote(){
   storage.clear();
@@ -237,8 +262,46 @@ function push_remote(){
 
 }
 
-function test_suiltes(){
-  test_build_id_array();
+// follwing methods are for unit testing
+function test_suites(){
+//  test_get_last_ng_id();
+  test_get_next_num();
+}
+
+function test_get_next_num(){
+   active_num = 11;
+   set_ans_count(10);
+   set_last_result(0, "OK");
+   set_last_result(1, "OK");
+   set_last_result(2, "OK");
+   set_last_result(3, "OK");
+   set_last_result(4, "OK");
+   set_last_result(5, "OK");
+   set_last_result(6, "OK");
+   set_last_result(7, "OK");
+   set_last_result(8, "OK");
+   set_last_result(9, "NG");
+   set_last_result(10, "OK");
+   assert("test_get_next_num", "", 9 , get_next_num());
+}
+
+function assert(func_name, msg, expected, actual){
+   if(expected == actual){
+     alert(func_name + ",ok");
+   } else {
+     alert(func_name + ",ng," + msg + ",expected=[" + expected + "],actual=[" + actual +"]");
+   }
+}
+
+function test_get_last_ng_id(){
+  set_last_result(10, "NG");
+  set_last_result(11, "OK");
+  alert(10 == get_last_ng_id(20, 10));
+}
+
+function test_get_last_ans(){
+   storage.setItem("last_ans1", "NG");
+   alert("NG" == get_last_result(1));
 }
 
 function test_push_remote(){
@@ -264,5 +327,6 @@ function build_id_array(val_arr){
 }
 
 </script>
+<!-- <input type="button" onclick="test_suites()" value="test" /> -->
 </body>
 </html>
